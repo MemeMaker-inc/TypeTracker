@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeTracker - あなたの指先の冒険を可視化</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --bg: #0f172a;
+            --bg-light: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .download-btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .hero-badge span {
+            color: var(--secondary);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--text) 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 16px 40px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 16px 40px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* Stats Display */
+        .hero-mockup {
+            margin-top: 60px;
+            position: relative;
+        }
+
+        .mockup-window {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .mockup-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .mockup-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .mockup-dot:nth-child(1) { background: #ef4444; }
+        .mockup-dot:nth-child(2) { background: #eab308; }
+        .mockup-dot:nth-child(3) { background: #22c55e; }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .stat-value.keys { color: var(--primary); }
+        .stat-value.distance { color: var(--secondary); }
+
+        .progress-section {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.875rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 100px;
+            width: 67%;
+            animation: progressGrow 2s ease-out;
+        }
+
+        @keyframes progressGrow {
+            from { width: 0; }
+        }
+
+        /* Features */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(16, 185, 129, 0.2));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Milestones */
+        .milestones {
+            padding: 100px 0;
+            background: var(--bg-light);
+        }
+
+        .milestones-showcase {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .milestones-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .milestones-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .milestones-content p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            margin-bottom: 32px;
+        }
+
+        .milestone-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .milestone-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .milestone-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .milestone-info h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .milestone-info span {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .milestones-visual {
+            flex: 1;
+            min-width: 300px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .badge {
+            aspect-ratio: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .badge:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+
+        .badge span {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .badge.locked {
+            opacity: 0.4;
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 100px 0;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.2);
+        }
+
+        .pricing-card.featured::before {
+            content: 'POPULAR';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 6px 20px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .pricing-card .price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .pricing-card .price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .pricing-card .description {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .pricing-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-features .check {
+            color: var(--secondary);
+        }
+
+        .pricing-features .cross {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .pricing-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .pricing-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .pricing-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .pricing-btn.secondary {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .pricing-btn.secondary:hover {
+            border-color: var(--text-muted);
+        }
+
+        /* Privacy */
+        .privacy {
+            padding: 80px 0;
+            background: var(--bg-light);
+        }
+
+        .privacy-content {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .privacy-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 24px;
+        }
+
+        .privacy h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .privacy p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            margin-bottom: 32px;
+        }
+
+        .privacy-badges {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .privacy-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--bg);
+            border-radius: 100px;
+            font-size: 0.875rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        .footer-copy {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .milestones-showcase {
+                flex-direction: column;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">⌨️</div>
+                <span>TypeTracker</span>
+            </div>
+            <a href="#download" class="download-btn">Download Free</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge">macOS Ventura+ <span>• 完全無料で始める</span></div>
+            <h1>
+                あなたの指先の冒険を<br>
+                <span class="highlight">可視化する</span>
+            </h1>
+            <p class="hero-description">
+                今日のタイピング量、何文字だと思いますか？<br>
+                TypeTrackerで毎日の入力をゲーム感覚で楽しもう。
+            </p>
+            <div class="hero-cta">
+                <a href="#download" class="btn-primary">
+                    <span>🍎</span> Download for Mac
+                </a>
+                <a href="#features" class="btn-secondary">機能を見る</a>
+            </div>
+
+            <div class="hero-mockup float">
+                <div class="mockup-window">
+                    <div class="mockup-header">
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-label">
+                            <div class="stat-icon">⌨️</div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text);">Today's Typing</div>
+                                <div style="font-size: 0.8rem;">Blog Post達成!</div>
+                            </div>
+                        </div>
+                        <div class="stat-value keys">12,456</div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-label">
+                            <div class="stat-icon">🖱️</div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text);">Cursor Distance</div>
+                                <div style="font-size: 0.8rem;">100m Sprint達成!</div>
+                            </div>
+                        </div>
+                        <div class="stat-value distance">2.3 km</div>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>📚 Short Story まで</span>
+                            <span>67%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>シンプルで、楽しい</h2>
+                <p>メニューバーに常駐して、あなたの入力量をリアルタイムで可視化</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⌨️</div>
+                    <h3>キーストローク計測</h3>
+                    <p>全てのキー入力をカウント。内容は一切記録しないので、プライバシーも安心。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🖱️</div>
+                    <h3>カーソル移動距離</h3>
+                    <p>マウス・トラックパッドの移動距離を物理単位で計測。今日何km動かした？</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>マイルストーン</h3>
+                    <p>ツイート、A4、ブログ記事...達成感のある目標を次々クリアしよう。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>週間レポート</h3>
+                    <p>1週間の推移をグラフで確認。自分の生産性パターンを発見しよう。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏃</div>
+                    <h3>リアルな比較対象</h3>
+                    <p>「フルマラソン分動かした」「ハリポタ1巻分打った」直感的に分かる単位で表示。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔋</div>
+                    <h3>軽量動作</h3>
+                    <p>バックグラウンドで効率的に動作。CPU・メモリへの影響は最小限。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="milestones">
+        <div class="container">
+            <div class="milestones-showcase">
+                <div class="milestones-content">
+                    <h2>達成感を、毎日</h2>
+                    <p>
+                        30以上のマイルストーンが、あなたのタイピングとカーソル移動を
+                        楽しいチャレンジに変えます。
+                    </p>
+                    <div class="milestone-list">
+                        <div class="milestone-item">
+                            <div class="milestone-icon">📝</div>
+                            <div class="milestone-info">
+                                <h4>Tweet → Blog → Novel</h4>
+                                <span>140文字から始まり、小説執筆量まで</span>
+                            </div>
+                        </div>
+                        <div class="milestone-item">
+                            <div class="milestone-icon">🏃</div>
+                            <div class="milestone-info">
+                                <h4>100m → Marathon → 東京-大阪</h4>
+                                <span>スプリントから長距離移動まで</span>
+                            </div>
+                        </div>
+                        <div class="milestone-item">
+                            <div class="milestone-icon">🏆</div>
+                            <div class="milestone-info">
+                                <h4>バッジコレクション</h4>
+                                <span>達成したマイルストーンをコレクション</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestones-visual">
+                    <div class="badge">📧<span>Email</span></div>
+                    <div class="badge">📄<span>A4</span></div>
+                    <div class="badge">📰<span>Blog</span></div>
+                    <div class="badge">📚<span>Story</span></div>
+                    <div class="badge">🖥️<span>Screen</span></div>
+                    <div class="badge">🏃<span>100m</span></div>
+                    <div class="badge">⚽<span>Field</span></div>
+                    <div class="badge">🏔️<span>Fuji</span></div>
+                    <div class="badge locked">📖<span>Novel</span></div>
+                    <div class="badge locked">🏅<span>10K</span></div>
+                    <div class="badge locked">🏆<span>Marathon</span></div>
+                    <div class="badge locked">✨<span>???</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2>シンプルな料金</h2>
+                <p>まずは無料で。気に入ったらProへ。</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Free</h3>
+                    <div class="price">¥0</div>
+                    <p class="description">基本機能で試してみる</p>
+                    <ul class="pricing-features">
+                        <li><span class="check">✓</span> 今日のトラッキング</li>
+                        <li><span class="check">✓</span> 基本マイルストーン (5個)</li>
+                        <li><span class="check">✓</span> メニューバー表示</li>
+                        <li><span class="cross">✗</span> 週間・月間履歴</li>
+                        <li><span class="cross">✗</span> 全マイルストーン</li>
+                        <li><span class="cross">✗</span> データエクスポート</li>
+                    </ul>
+                    <a href="#download" class="pricing-btn secondary">無料ダウンロード</a>
+                </div>
+                <div class="pricing-card featured">
+                    <h3>Pro</h3>
+                    <div class="price">¥980 <span>買い切り</span></div>
+                    <p class="description">すべての機能をアンロック</p>
+                    <ul class="pricing-features">
+                        <li><span class="check">✓</span> Freeの全機能</li>
+                        <li><span class="check">✓</span> 週間・月間・年間履歴</li>
+                        <li><span class="check">✓</span> 全マイルストーン (30+)</li>
+                        <li><span class="check">✓</span> CSV/JSONエクスポート</li>
+                        <li><span class="check">✓</span> カスタムマイルストーン</li>
+                        <li><span class="check">✓</span> iCloud同期</li>
+                    </ul>
+                    <a href="#download" class="pricing-btn primary">Proを購入</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="privacy">
+        <div class="container">
+            <div class="privacy-content">
+                <div class="privacy-icon">🔒</div>
+                <h2>プライバシーファースト</h2>
+                <p>
+                    TypeTrackerは入力内容を一切記録しません。<br>
+                    カウントのみを行い、すべてのデータはあなたのMacにローカル保存されます。
+                </p>
+                <div class="privacy-badges">
+                    <div class="privacy-badge">🔐 入力内容は記録しない</div>
+                    <div class="privacy-badge">💾 ローカル保存</div>
+                    <div class="privacy-badge">🚫 ネットワーク送信なし</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero" id="download" style="padding: 100px 0;">
+        <div class="container">
+            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">今すぐ始めよう</h2>
+            <p class="hero-description">macOS 13 Ventura以降対応</p>
+            <div class="hero-cta">
+                <a href="#" class="btn-primary">
+                    <span>⬇️</span> Download v1.0.0
+                </a>
+            </div>
+            <p style="margin-top: 24px; color: var(--text-muted); font-size: 0.875rem;">
+                または App Store からダウンロード (準備中)
+            </p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <div class="logo-icon">⌨️</div>
+                    <span>TypeTracker</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#">プライバシーポリシー</a>
+                    <a href="#">利用規約</a>
+                    <a href="#">お問い合わせ</a>
+                    <a href="https://twitter.com" target="_blank">Twitter</a>
+                </div>
+            </div>
+            <p class="footer-copy" style="margin-top: 40px; text-align: center;">
+                © 2026 TypeTracker. Made with ❤️ in Japan.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

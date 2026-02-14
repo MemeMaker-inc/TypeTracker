@@ -1,5 +1,6 @@
 # Xcode
 build/
+*.dmg
 DerivedData/
 *.xcuserstate
 *.xcworkspace
